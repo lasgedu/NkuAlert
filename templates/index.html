@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NkuAlert - Timely Local Alerts</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>NkuAlert</h1>
+            <p class="tagline">Timely local alerts for weather, health, and civic updates</p>
+        </header>
+
+        <nav class="filters">
+            <a href="/" class="filter-btn {% if selected_category == 'All' %}active{% endif %}">All</a>
+            <a href="/filter/Weather" class="filter-btn {% if selected_category == 'Weather' %}active{% endif %}">Weather</a>
+            <a href="/filter/Health" class="filter-btn {% if selected_category == 'Health' %}active{% endif %}">Health</a>
+            <a href="/filter/Civic" class="filter-btn {% if selected_category == 'Civic' %}active{% endif %}">Civic</a>
+            <a href="/filter/Emergency" class="filter-btn {% if selected_category == 'Emergency' %}active{% endif %}">Emergency</a>
+        </nav>
+
+        <div class="actions">
+            <a href="/post" class="btn-post">+ Post New Alert (Admin)</a>
+        </div>
+
+        <main>
+            <h2>Latest Alerts</h2>
+            
+            {% if alerts %}
+                <div class="alerts">
+                    {% for alert in alerts[:10] %}
+                    <div class="alert-card {% if is_past(alert) %}past{% endif %}">
+                        <div class="alert-header">
+                            <span class="category-badge category-{{ alert.category.lower() }}">{{ alert.category }}</span>
+                            {% if is_past(alert) %}
+                            <span class="past-badge">Past</span>
+                            {% endif %}
+                        </div>
+                        <p class="alert-message">{{ alert.message }}</p>
+                        <div class="alert-footer">
+                            <span class="location"> {{ alert.location }}</span>
+                            <span class="timestamp">{{ alert.timestamp[:16].replace('T', ' ') }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-alerts">
+                    <p>No alerts available at this time.</p>
+                </div>
+            {% endif %}
+        </main>
+
+        <footer>
+            <p>&copy; 2024 NkuAlert - Community Alert System</p>
+        </footer>
+    </div>
+</body>
+</html>
