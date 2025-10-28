@@ -37,7 +37,7 @@ NkuAlert solves this by providing a lightweight, web-accessible platform where t
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone <https://github.com/lasgedu/NkuAlert>
    cd NkuAlert
    ```
 
@@ -138,10 +138,6 @@ This is a semester project. For team members:
 2. Make your changes
 3. Submit a pull request
 4. Ensure all tests pass
-
-## License
-
-MIT License - See LICENSE file for details
 
 ## Team Members
 

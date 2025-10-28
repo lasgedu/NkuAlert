@@ -30,31 +30,136 @@ def init_alerts():
         sample_alerts = [
             {
                 "id": 1,
-                "category": "Weather",
-                "message": "Heavy rainfall expected in Northern Province tomorrow. Stay indoors.",
-                "location": "Northern Province",
+                "category": "Civic",
+                "message": "Monthly Umuganda scheduled for this Saturday at 7 AM. All community members should participate.",
+                "location": "Kigali City",
                 "timestamp": (datetime.now() - timedelta(hours=2)).isoformat()
             },
             {
                 "id": 2,
-                "category": "Health",
-                "message": "Malaria prevention campaign starting next week in all health centers.",
-                "location": "All Regions",
-                "timestamp": (datetime.now() - timedelta(hours=12)).isoformat()
+                "category": "Weather",
+                "message": "Heavy rainfall expected in Kigali tomorrow. Stay indoors and avoid flooded areas.",
+                "location": "Kigali City",
+                "timestamp": (datetime.now() - timedelta(hours=1)).isoformat()
             },
             {
                 "id": 3,
-                "category": "Civic",
-                "message": "Community meeting scheduled for Saturday at 2 PM at the community center.",
-                "location": "Community Center",
-                "timestamp": (datetime.now() - timedelta(days=1)).isoformat()
+                "category": "Health",
+                "message": "Malaria prevention campaign starting next week at Kimironko Health Center. Free mosquito nets distribution.",
+                "location": "Kimironko, Kigali",
+                "timestamp": (datetime.now() - timedelta(hours=12)).isoformat()
             },
             {
                 "id": 4,
                 "category": "Emergency",
-                "message": "Power outage scheduled for maintenance from 9 AM to 12 PM.",
-                "location": "Central District",
+                "message": "Water supply interruption in Remera area for maintenance works. Water tankers available at sector office.",
+                "location": "Remera, Kigali",
                 "timestamp": (datetime.now() - timedelta(hours=6)).isoformat()
+            },
+            {
+                "id": 5,
+                "category": "Civic",
+                "message": "Gacaca court hearing scheduled for Thursday at Nyarugenge District Court. All concerned parties to attend.",
+                "location": "Nyarugenge District",
+                "timestamp": (datetime.now() - timedelta(hours=18)).isoformat()
+            },
+            {
+                "id": 6,
+                "category": "Weather",
+                "message": "Long dry season expected. Farmers advised to prepare for irrigation. Government subsidies available.",
+                "location": "Rwanda",
+                "timestamp": (datetime.now() - timedelta(days=1)).isoformat()
+            },
+            {
+                "id": 7,
+                "category": "Health",
+                "message": "COVID-19 vaccination campaign at Kacyiru Health Center. Priority for elderly and immunocompromised.",
+                "location": "Kacyiru, Kigali",
+                "timestamp": (datetime.now() - timedelta(days=2)).isoformat()
+            },
+            {
+                "id": 8,
+                "category": "Emergency",
+                "message": "Power outage scheduled for Nyamirambo sector due to infrastructure upgrade. Backup generators at hospitals.",
+                "location": "Nyamirambo, Kigali",
+                "timestamp": (datetime.now() - timedelta(hours=24)).isoformat()
+            },
+            {
+                "id": 9,
+                "category": "Civic",
+                "message": "Genocide Memorial Week activities starting Monday at Kigali Genocide Memorial. Public invited to participate.",
+                "location": "Kigali City",
+                "timestamp": (datetime.now() - timedelta(days=3)).isoformat()
+            },
+            {
+                "id": 10,
+                "category": "Weather",
+                "message": "Frost warning issued for Northern Province. Farmers urged to protect crops overnight.",
+                "location": "Northern Province",
+                "timestamp": (datetime.now() - timedelta(days=4)).isoformat()
+            },
+            {
+                "id": 11,
+                "category": "Health",
+                "message": "Mobile health clinic visiting Gikondo sector. Free health screenings and consultations available.",
+                "location": "Gikondo, Kigali",
+                "timestamp": (datetime.now() - timedelta(days=5)).isoformat()
+            },
+            {
+                "id": 12,
+                "category": "Emergency",
+                "message": "Flood alert for low-lying areas near Nyabarongo River. Residents advised to move to higher ground.",
+                "location": "Kamonyi District",
+                "timestamp": (datetime.now() - timedelta(days=6)).isoformat()
+            },
+            {
+                "id": 13,
+                "category": "Civic",
+                "message": "Community meeting at Kanombe sector office to discuss waste management and recycling program.",
+                "location": "Kanombe, Kigali",
+                "timestamp": (datetime.now() - timedelta(days=7)).isoformat()
+            },
+            {
+                "id": 14,
+                "category": "Weather",
+                "message": "Strong winds expected in Kigali. Secure outdoor furniture and be cautious on roads.",
+                "location": "Kigali City",
+                "timestamp": (datetime.now() - timedelta(days=8)).isoformat()
+            },
+            {
+                "id": 15,
+                "category": "Health",
+                "message": "Nutrition training workshop at Muhima Health Center. Pregnant women and new mothers encouraged to attend.",
+                "location": "Muhima, Kigali",
+                "timestamp": (datetime.now() - timedelta(days=9)).isoformat()
+            },
+            {
+                "id": 16,
+                "category": "Emergency",
+                "message": "Fire outbreak reported in Gisozi area. Fire department responding. Avoid the area until cleared.",
+                "location": "Gisozi, Kigali",
+                "timestamp": (datetime.now() - timedelta(days=10)).isoformat()
+            },
+            {
+                "id": 17,
+                "category": "Civic",
+                "message": "Rwanda Day celebration at BK Arena. Cultural performances and community activities planned.",
+                "location": "Kigali City",
+                "timestamp": (datetime.now() - timedelta(days=11)).isoformat()
+            },
+            {
+                "id": 18,
+                "category": "Weather",
+                "message": "Hailstorm warning for Eastern Province. Protect vehicles and crops from potential damage.",
+                "location": "Eastern Province",
+                "timestamp": (datetime.now() - timedelta(days=12)).isoformat()
+            },
+            {
+                "id": 19,
+                "category": "Health",
+                "message": "Mental health awareness campaign at Kimisagara Youth Center. Free counseling sessions available.",
+                "location": "Kimisagara, Kigali",
+                "timestamp": (datetime.now() - timedelta(days=13)).isoformat()
             }
         ]
         save_alerts(sample_alerts)
