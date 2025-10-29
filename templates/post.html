@@ -9,42 +9,42 @@
 <body>
     <div class="container">
         <header>
-            <h1>Post New Alert</h1>
-            <p class="tagline">Admin Alert Posting</p>
+            <h1>{% if alert %}{{ t('form_title_edit') }}{% else %}{{ t('form_title_new') }}{% endif %}</h1>
+            <p class="tagline">{{ t('form_tagline') }}</p>
         </header>
 
         <main class="form-container">
-            <form method="POST" action="/post" class="alert-form">
+            <form method="POST" action="{% if alert %}{{ url_for('edit_alert', alert_id=alert.id) }}{% else %}{{ url_for('post_alert') }}{% endif %}" class="alert-form">
                 <div class="form-group">
-                    <label for="category">Category *</label>
+                    <label for="category">{{ t('category') }} *</label>
                     <select name="category" id="category" required>
-                        <option value="">Select a category</option>
-                        <option value="Weather">Weather</option>
-                        <option value="Health">Health</option>
-                        <option value="Civic">Civic</option>
-                        <option value="Emergency">Emergency</option>
+                        <option value="">{{ t('select_category') }}</option>
+                        <option value="Weather" {% if alert and alert.category=='Weather' %}selected{% endif %}>{{ category_label('Weather') }}</option>
+                        <option value="Health" {% if alert and alert.category=='Health' %}selected{% endif %}>{{ category_label('Health') }}</option>
+                        <option value="Civic" {% if alert and alert.category=='Civic' %}selected{% endif %}>{{ category_label('Civic') }}</option>
+                        <option value="Emergency" {% if alert and alert.category=='Emergency' %}selected{% endif %}>{{ category_label('Emergency') }}</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="message">Message *</label>
-                    <textarea name="message" id="message" rows="4" required placeholder="Enter the alert message..."></textarea>
+                    <label for="message">{{ t('message') }} *</label>
+                    <textarea name="message" id="message" rows="4" required placeholder="{{ t('message') }}">{% if alert %}{{ alert.message }}{% endif %}</textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="location">Location *</label>
-                    <input type="text" name="location" id="location" required placeholder="e.g., Northern Province">
+                    <label for="location">{{ t('location') }} *</label>
+                    <input type="text" name="location" id="location" required placeholder="e.g., Northern Province" value="{% if alert %}{{ alert.location }}{% endif %}">
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn-submit">Post Alert</button>
-                    <a href="/" class="btn-cancel">Cancel</a>
+                    <button type="submit" class="btn-submit">{% if alert %}{{ t('update_alert') }}{% else %}{{ t('post_alert') }}{% endif %}</button>
+                    <a href="/" class="btn-cancel">{{ t('cancel') }}</a>
                 </div>
             </form>
         </main>
 
         <footer>
-            <p>&copy; 2025 NkuAlert - Community Alert System</p>
+            <p>&copy; 2025 NkuAlert - {{ t('footer') }}</p>
         </footer>
     </div>
 </body>

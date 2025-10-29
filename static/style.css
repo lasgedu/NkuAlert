@@ -29,6 +29,24 @@ header {
     text-align: center;
 }
 
+.lang-switch {
+    margin-top: 8px;
+    font-size: 0.9em;
+}
+
+.lang-switch a {
+    color: #f7fafc;
+    text-decoration: none;
+    padding: 2px 6px;
+    border-radius: 4px;
+    opacity: 0.9;
+}
+
+.lang-switch a.active {
+    background: rgba(255,255,255,0.2);
+    font-weight: 600;
+}
+
 header h1 {
     font-size: 2em;
     margin-bottom: 5px;
@@ -168,6 +186,40 @@ main h2 {
     justify-content: space-between;
     font-size: 0.85em;
     color: #718096;
+}
+
+.alert-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.btn-edit {
+    display: inline-block;
+    padding: 8px 14px;
+    background: #3182ce; /* blue */
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.9em;
+}
+
+.btn-edit:hover {
+    background: #2b6cb0;
+}
+
+.btn-delete {
+    padding: 8px 14px;
+    background: #e53e3e; /* red */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+
+.btn-delete:hover {
+    background: #c53030;
 }
 
 .location {
