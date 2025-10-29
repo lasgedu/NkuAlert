@@ -93,15 +93,18 @@ NkuAlert solves this by providing a lightweight, web-accessible platform where t
 - Your selection is remembered in your browser session.
 
 ## Team Members
-- Chiedu Paul Unekwe - Create repository and add Members as collaborator
-                    - Write initial application code
-                    - Implement the core feature
 
-- Vestine Pendo 
-                - Configure branch protection rules
-                - Create GitHub Projects board (8-10 items)
-                - Write README.md with project description
-                - Add setup instructions
+- Chiedu Paul Unekwe (GitHub: @lasgedu)
+  - Repository initialization and collaborator access
+  - Initial Flask app and core feature implementation
+  - Templates and API endpoints
+  - PR reviews and merges
+
+- Vestine Pendo (GitHub: @GITHUB_USERNAME)
+  - Branch protection rules configuration
+  - GitHub Projects board (8–10 items) and labeling
+  - README authoring and setup instructions
+  - UI styling, language toggle, and admin edit/delete UX
 
 ## Future Enhancements
 - User authentication and authorization
