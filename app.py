@@ -1,9 +1,10 @@
-﻿from flask import Flask, render_template, request, redirect, url_for, jsonify
+﻿from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 from datetime import datetime, timedelta
 import json
 import os
 
 app = Flask(__name__)
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'dev-secret-key')
 
 # JSON file to store alerts
 ALERTS_FILE = 'alerts.json'
@@ -165,6 +166,98 @@ def init_alerts():
         save_alerts(sample_alerts)
     return load_alerts()
 
+
+# ---- i18n helpers ----
+LANG_EN = 'en'
+LANG_RW = 'rw'
+
+TRANSLATIONS = {
+    'en': {
+        'title': 'NkuAlert',
+        'tagline': 'Timely local alerts for weather, health, and civic updates',
+        'filters_all': 'All',
+        'filters_weather': 'Weather',
+        'filters_health': 'Health',
+        'filters_civic': 'Civic',
+        'filters_emergency': 'Emergency',
+        'post_new': '+ Post New Alert (Admin)',
+        'latest_alerts': 'Latest Alerts',
+        'past': 'Past',
+        'no_alerts': 'No alerts available at this time.',
+        'footer': 'Community Alert System',
+        'lang_en': 'English',
+        'lang_rw': 'Kinyarwanda',
+        'edit': 'Edit',
+        'delete': 'Delete',
+        'form_title_new': 'Post New Alert',
+        'form_title_edit': 'Edit Alert',
+        'form_tagline': 'Admin Alert Posting',
+        'category': 'Category',
+        'select_category': 'Select a category',
+        'message': 'Message',
+        'location': 'Location',
+        'post_alert': 'Post Alert',
+        'update_alert': 'Update Alert',
+        'cancel': 'Cancel',
+        'category_label': {
+            'All': 'All',
+            'Weather': 'Weather',
+            'Health': 'Health',
+            'Civic': 'Civic',
+            'Emergency': 'Emergency',
+        },
+    },
+    'rw': {
+        'title': 'NkuAlert',
+        'tagline': 'Amakuru yihutirwa y’ikirere, ubuzima, na serivisi z’abaturage',
+        'filters_all': 'Byose',
+        'filters_weather': 'Ikirere',
+        'filters_health': 'Ubuzima',
+        'filters_civic': 'Abaturage',
+        'filters_emergency': 'Byihutirwa',
+        'post_new': '+ Ongeramo Itangazo (Admin)',
+        'latest_alerts': 'Amatangazo Aheruka',
+        'past': 'Byashize',
+        'no_alerts': 'Nta matangazo ahari ubu.',
+        'footer': 'Sisitemu y’Amatangazo y’Abaturage',
+        'lang_en': 'Icyongereza',
+        'lang_rw': 'Ikinyarwanda',
+        'edit': 'Hindura',
+        'delete': 'Siba',
+        'form_title_new': 'Ongeramo Itangazo',
+        'form_title_edit': 'Hindura Itangazo',
+        'form_tagline': 'Uburyo bwa Admin bwo Kwandika',
+        'category': 'Icyiciro',
+        'select_category': 'Hitamo icyiciro',
+        'message': 'Ubutumwa',
+        'location': 'Aho Biherereye',
+        'post_alert': 'Ohereza Itangazo',
+        'update_alert': 'Hindura Itangazo',
+        'cancel': 'Subira Inyuma',
+        'category_label': {
+            'All': 'Byose',
+            'Weather': 'Ikirere',
+            'Health': 'Ubuzima',
+            'Civic': 'Abaturage',
+            'Emergency': 'Byihutirwa',
+        },
+    },
+}
+
+
+def get_lang():
+    lang = session.get('lang', LANG_EN)
+    return lang if lang in TRANSLATIONS else LANG_EN
+
+
+def t(key):
+    return TRANSLATIONS[get_lang()].get(key, key)
+
+
+def category_label(category_key):
+    mapping = TRANSLATIONS[get_lang()].get('category_label', {})
+    return mapping.get(category_key, category_key)
+
 @app.route('/')
 def index():
     """Display all alerts on the homepage"""
@@ -204,7 +297,7 @@ def post_alert():
         
         return redirect(url_for('index'))
     
-    return render_template('post.html')
+    return render_template('post.html', alert=None)
 
 @app.route('/api/alerts')
 def api_alerts():
@@ -213,13 +306,46 @@ def api_alerts():
     alerts.sort(key=lambda x: x['timestamp'], reverse=True)
     return jsonify(alerts)
 
+
+@app.route('/edit/<int:alert_id>', methods=['GET', 'POST'])
+def edit_alert(alert_id: int):
+    alerts = load_alerts()
+    target = next((a for a in alerts if a['id'] == alert_id), None)
+    if not target:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        target['category'] = request.form['category']
+        target['message'] = request.form['message']
+        target['location'] = request.form['location']
+        target['timestamp'] = datetime.now().isoformat()
+        save_alerts(alerts)
+        return redirect(url_for('index'))
+
+    return render_template('post.html', alert=target)
+
+
+@app.route('/delete/<int:alert_id>', methods=['POST'])
+def delete_alert(alert_id: int):
+    alerts = load_alerts()
+    alerts = [a for a in alerts if a['id'] != alert_id]
+    save_alerts(alerts)
+    return redirect(url_for('index'))
+
+
+@app.route('/lang/<lang_code>')
+def set_language(lang_code: str):
+    if lang_code in TRANSLATIONS:
+        session['lang'] = lang_code
+    return redirect(request.referrer or url_for('index'))
+
 def is_past(alert):
     """Check if alert is older than 72 hours"""
     alert_time = datetime.fromisoformat(alert['timestamp'])
     return datetime.now() - alert_time > timedelta(hours=72)
 
-# Make is_past available to templates
-app.jinja_env.globals.update(is_past=is_past)
+# Make helpers available to templates
+app.jinja_env.globals.update(is_past=is_past, t=t, category_label=category_label, get_lang=get_lang)
 
 if __name__ == '__main__':
     init_alerts()
