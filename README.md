@@ -5,7 +5,7 @@
 ## Project Description
 
 ### Problem Statement
-In many Rwanda communitiesespecially rural or semi-urban areaspeople rely on word of mouth, radio, or delayed SMS for critical information like heavy rain warnings, disease outbreaks, power outages, or community meetings. There is often no centralized, low-tech, or accessible system to broadcast and retrieve verified local alerts quickly. This leads to missed warnings, poor preparedness, and reduced civic engagement.
+In many Rwandan communities — especially rural or semi‑urban areas — people rely on word of mouth, radio, or delayed SMS for critical information like heavy rain warnings, disease outbreaks, power outages, or community meetings. There is often no centralized, low‑tech, or accessible system to broadcast and retrieve verified local alerts quickly. This leads to missed warnings, poor preparedness, and reduced civic engagement.
 
 NkuAlert solves this by providing a lightweight, web-accessible platform where trusted local admins can post alerts, and community members can view the latest updates.
 
@@ -84,64 +84,16 @@ NkuAlert solves this by providing a lightweight, web-accessible platform where t
    - Specify the location
 3. Click "Post Alert" to submit
 
-## File Structure
-```
-NkuAlert/
- app.py                 # Main Flask application
- requirements.txt       # Python dependencies
- Dockerfile            # Docker configuration
- .gitignore           # Git ignore rules
- README.md            # Project documentation
- alerts.json          # Data storage (created at runtime)
- templates/           # HTML templates
-    index.html       # Main page
-    post.html        # Alert posting form
- static/             # Static files
-     style.css       # Stylesheet
-```
-
-## API Endpoints
-
-- `GET /` - Display all alerts
-- `GET /filter/<category>` - Filter alerts by category
-- `GET /post` - Display alert posting form
-- `POST /post` - Submit new alert
-- `GET /api/alerts` - JSON API endpoint for all alerts
-
-## Development
-
-### Running in Development Mode
-```bash
-export FLASK_ENV=development
-python app.py
-```
-
-### Data Persistence
-Alerts are stored in `alerts.json` in the project root. This file is created automatically with sample data on first run.
-
-## Deployment
-
-### Render.com
-1. Connect your GitHub repository to Render
-2. Create a new Web Service
-3. Select the repository
-4. Build command: `pip install -r requirements.txt`
-5. Start command: `python app.py`
-
-### AWS ECS / Fly.io
-Deploy the Docker container following respective platform documentation.
-
-## Contributing
-
-This is a semester project. For team members:
-1. Create a feature branch
-2. Make your changes
-3. Submit a pull request
-4. Ensure all tests pass
-
 ## Team Members
+- Chiedu Paul Unekwe - Create repository and add Members as collaborator
+                    - Write initial application code
+                    - Implement the core feature
 
-- [List team member names and roles here]
+- Vestine Pendo 
+                - Configure branch protection rules
+                - Create GitHub Projects board (8-10 items)
+                - Write README.md with project description
+                - Add setup instructions
 
 ## Future Enhancements
 - User authentication and authorization
@@ -151,3 +103,10 @@ This is a semester project. For team members:
 - Multi-language support (Kinyarwanda, English)
 - Image attachments for alerts
 - Push notifications
+
+## Project Management (F1 Checklist)
+
+- Project Board: [add board URL]
+- Milestone: `M1 - Initial Release (Sprint 1)` (created: [yes/no])
+- Labels: feature, devops, bug, enhancement, documentation, priority:high, priority:medium, priority:low ([created: yes/no])
+- Branch Protection on `main`: PR required, 1 approval, stale approvals dismissed, status checks, up-to-date before merge, conversations resolved, include admins ([enabled: yes/no])
