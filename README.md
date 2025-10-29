@@ -84,6 +84,14 @@ NkuAlert solves this by providing a lightweight, web-accessible platform where t
    - Specify the location
 3. Click "Post Alert" to submit
 
+### Editing or Deleting Alerts (Admin)
+- To edit: Click "Edit" on an alert card, update fields, then click "Update Alert".
+- To delete: Click "Delete" on an alert card to remove it.
+
+### Language Selection
+- Use the language links at the top to switch between English and Kinyarwanda.
+- Your selection is remembered in your browser session.
+
 ## Team Members
 - Chiedu Paul Unekwe - Create repository and add Members as collaborator
                     - Write initial application code
@@ -100,9 +108,10 @@ NkuAlert solves this by providing a lightweight, web-accessible platform where t
 - Database migration from JSON to SQLite/PostgreSQL
 - SMS/Email notifications
 - Mobile app integration
-- Multi-language support (Kinyarwanda, English)
 - Image attachments for alerts
 - Push notifications
+
+
 
 ## Project Management (F1 Checklist)
 
