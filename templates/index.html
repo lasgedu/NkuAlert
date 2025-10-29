@@ -9,33 +9,38 @@
 <body>
     <div class="container">
         <header>
-            <h1>NkuAlert</h1>
-            <p class="tagline">Timely local alerts for weather, health, and civic updates</p>
+            <h1>{{ t('title') }}</h1>
+            <p class="tagline">{{ t('tagline') }}</p>
+            <div class="lang-switch">
+                <a href="{{ url_for('set_language', lang_code='en') }}" class="{% if get_lang()=='en' %}active{% endif %}">{{ t('lang_en') }}</a>
+                <span> | </span>
+                <a href="{{ url_for('set_language', lang_code='rw') }}" class="{% if get_lang()=='rw' %}active{% endif %}">{{ t('lang_rw') }}</a>
+            </div>
         </header>
 
         <nav class="filters">
-            <a href="/" class="filter-btn {% if selected_category == 'All' %}active{% endif %}">All</a>
-            <a href="/filter/Weather" class="filter-btn {% if selected_category == 'Weather' %}active{% endif %}">Weather</a>
-            <a href="/filter/Health" class="filter-btn {% if selected_category == 'Health' %}active{% endif %}">Health</a>
-            <a href="/filter/Civic" class="filter-btn {% if selected_category == 'Civic' %}active{% endif %}">Civic</a>
-            <a href="/filter/Emergency" class="filter-btn {% if selected_category == 'Emergency' %}active{% endif %}">Emergency</a>
+            <a href="/" class="filter-btn {% if selected_category == 'All' %}active{% endif %}">{{ t('filters_all') }}</a>
+            <a href="/filter/Weather" class="filter-btn {% if selected_category == 'Weather' %}active{% endif %}">{{ t('filters_weather') }}</a>
+            <a href="/filter/Health" class="filter-btn {% if selected_category == 'Health' %}active{% endif %}">{{ t('filters_health') }}</a>
+            <a href="/filter/Civic" class="filter-btn {% if selected_category == 'Civic' %}active{% endif %}">{{ t('filters_civic') }}</a>
+            <a href="/filter/Emergency" class="filter-btn {% if selected_category == 'Emergency' %}active{% endif %}">{{ t('filters_emergency') }}</a>
         </nav>
 
         <div class="actions">
-            <a href="/post" class="btn-post">+ Post New Alert (Admin)</a>
+            <a href="/post" class="btn-post">{{ t('post_new') }}</a>
         </div>
 
         <main>
-            <h2>Latest Alerts</h2>
+            <h2>{{ t('latest_alerts') }}</h2>
             
             {% if alerts %}
                 <div class="alerts">
                     {% for alert in alerts[:10] %}
                     <div class="alert-card {% if is_past(alert) %}past{% endif %}">
                         <div class="alert-header">
-                            <span class="category-badge category-{{ alert.category.lower() }}">{{ alert.category }}</span>
+                            <span class="category-badge category-{{ alert.category.lower() }}">{{ category_label(alert.category) }}</span>
                             {% if is_past(alert) %}
-                            <span class="past-badge">Past</span>
+                            <span class="past-badge">{{ t('past') }}</span>
                             {% endif %}
                         </div>
                         <p class="alert-message">{{ alert.message }}</p>
@@ -43,18 +48,24 @@
                             <span class="location"> {{ alert.location }}</span>
                             <span class="timestamp">{{ alert.timestamp[:16].replace('T', ' ') }}</span>
                         </div>
+                        <div class="alert-actions">
+                            <a class="btn-edit" href="{{ url_for('edit_alert', alert_id=alert.id) }}">{{ t('edit') }}</a>
+                            <form method="POST" action="{{ url_for('delete_alert', alert_id=alert.id) }}" style="display:inline" onsubmit="return confirm('Delete this alert?');">
+                                <button type="submit" class="btn-delete">{{ t('delete') }}</button>
+                            </form>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
             {% else %}
                 <div class="no-alerts">
-                    <p>No alerts available at this time.</p>
+                    <p>{{ t('no_alerts') }}</p>
                 </div>
             {% endif %}
         </main>
 
         <footer>
-            <p>&copy; 2025 NkuAlert - Community Alert System</p>
+            <p>&copy; 2025 NkuAlert - {{ t('footer') }}</p>
         </footer>
     </div>
 </body>
