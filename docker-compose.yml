@@ -1,0 +1,19 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nkualert-app:latest
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_ENV: development
+      FLASK_SECRET_KEY: super-secret-change-me
+      ALERTS_FILE: /app/data/alerts.json
+    volumes:
+      - ./data:/app/data
+      - ./templates:/app/templates:ro
+      - ./static:/app/static:ro
+    command: python app.py
+
