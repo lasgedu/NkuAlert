@@ -7,7 +7,7 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'dev-secret-key')
 
 # JSON file to store alerts
-ALERTS_FILE = 'alerts.json'
+ALERTS_FILE = os.environ.get('ALERTS_FILE', 'alerts.json')
 
 def load_alerts():
     """Load alerts from JSON file or return empty list"""
