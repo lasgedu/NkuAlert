@@ -74,7 +74,7 @@ NkuAlert solves this by providing a lightweight, web-accessible platform where t
 ### Viewing Alerts
 - Visit the homepage to see all alerts sorted by most recent
 - Use the filter buttons (All, Weather, Health, Civic, Emergency) to view specific categories
-- Alerts older than 72 hours are marked with a "Past" badge
+- Alert older than 72 hours are marked with a "Past" badge
 
 ### Posting New Alerts (Admin)
 1. Click the "+ Post New Alert (Admin)" button
