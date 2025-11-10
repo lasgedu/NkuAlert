@@ -150,18 +150,10 @@ Docker Compose lets you build and run everything with one command while persisti
   - Code reviews on pull requests
   - Project board maintenance and continued use
 
-## Future Enhancements
-- User authentication and authorization
-- Database migration from JSON to SQLite/PostgreSQL
-- SMS/Email notifications
-- Mobile app integration
-- Image attachments for alerts
-- Push notifications
-- GitHub Actions CI/CD pipeline implementation
+## Progress Report
 
-## Project Management (F1 Checklist)
+As a team, one of our main challenges during this phase was Docker installation and setup. It became a problem on some of our machines due to version incompatibilities and environment configuration issues. Building the Docker image and ensuring it ran correctly across different systems required extra troubleshooting. We also encountered difficulties setting up GitHub Actions for Continuous Integration (CI), especially in configuring the workflow files and ensuring the automated builds passed all tests without errors.
 
-- Project Board: [add board URL]
-- Milestone: `M1 - Initial Release (Sprint 1)` (created: [yes/no])
-- Labels: feature, devops, bug, enhancement, documentation, priority:high, priority:medium, priority:low ([created: yes/no])
-- Branch Protection on `main`: PR required, 1 approval, stale approvals dismissed, status checks, up-to-date before merge, conversations resolved, include admins ([enabled: yes/no])
+Through this experience, we learned how Docker helps create a consistent environment for running applications regardless of the host machine. We also gained valuable insights into CI and how it automates the build, test, and validation process, improving efficiency and reducing manual errors. This helped us better understand the importance of DevOps practices in modern software development.
+
+Compared to F1, the NkuAlert project has evolved significantly. We introduced Docker containerization, implemented a CI workflow using GitHub Actions, and improved our documentation and project structure. These enhancements have made the project more reliable, scalable, and easier to collaborate on as a team.
