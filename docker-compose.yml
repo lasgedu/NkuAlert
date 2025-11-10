@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nkualert:latest
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_SECRET_KEY=dev-secret-key
+      - ALERTS_FILE=/data/alerts.json
+    volumes:
+      - alerts_data:/data
+    restart: unless-stopped
+
+volumes:
+  alerts_data:
+    driver: local
+
+

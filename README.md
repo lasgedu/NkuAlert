@@ -69,6 +69,40 @@ NkuAlert solves this by providing a lightweight, web-accessible platform where t
 3. **Access the application**
    Open your browser and navigate to `http://localhost:5000`
 
+### Running with Docker Compose
+
+Docker Compose lets you build and run everything with one command while persisting alert data.
+
+1. **Start the stack (builds if needed)**
+   ```bash
+   docker compose up --build
+   ```
+   
+   To run in the background (detached mode):
+   ```bash
+   docker compose up -d --build
+   ```
+
+2. **Open the app**
+   Visit `http://localhost:5000` in your browser.
+
+3. **Environment variables**
+   - `FLASK_SECRET_KEY` controls Flask session encryption (override in production).
+   - `ALERTS_FILE` points to the alerts JSON file (defaults to `/data/alerts.json`).
+
+4. **Persisted data**
+   Alerts are stored in the named volume `alerts_data`, so they survive container restarts.
+
+5. **Stop the services**
+   ```bash
+   docker compose down
+   ```
+
+6. **Clean up volumes (removes saved alerts)**
+   ```bash
+   docker compose down -v
+   ```
+
 ## Usage
 
 ### Viewing Alerts
@@ -100,11 +134,21 @@ NkuAlert solves this by providing a lightweight, web-accessible platform where t
   - Templates and API endpoints
   - PR reviews and merges
 
-- Vestine Pendo (GitHub: @GITHUB_USERNAME)
+- Vestine Pendo (GitHub: @vpendo)
   - Branch protection rules configuration
   - GitHub Projects board (8–10 items) and labeling
   - README authoring and setup instructions
   - UI styling, language toggle, and admin edit/delete UX
+  - Dockerfile creation and optimization (non-root user, security hardening, Python 3.11.9)
+  - docker-compose.yml configuration (container orchestration, volumes, networking)
+  - .dockerignore file creation
+
+- Bosco Ishimwe (GitHub: @[username])
+  - Branch protection rules: Require CI checks to pass before merging to main
+  - Pull request integration and code review process
+  - Team collaboration facilitation: Multiple team member contributions
+  - Code reviews on pull requests
+  - Project board maintenance and continued use
 
 ## Future Enhancements
 - User authentication and authorization
@@ -113,8 +157,7 @@ NkuAlert solves this by providing a lightweight, web-accessible platform where t
 - Mobile app integration
 - Image attachments for alerts
 - Push notifications
-
-
+- GitHub Actions CI/CD pipeline implementation
 
 ## Project Management (F1 Checklist)
 
