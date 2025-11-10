@@ -6,8 +6,8 @@ import os
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'dev-secret-key')
 
-# JSON file to store alerts
-ALERTS_FILE = 'alerts.json'
+# JSON file to store alerts (configurable via environment variable)
+ALERTS_FILE = os.environ.get('ALERTS_FILE', 'alerts.json')
 
 def load_alerts():
     """Load alerts from JSON file or return empty list"""
@@ -21,6 +21,9 @@ def load_alerts():
 
 def save_alerts(alerts):
     """Save alerts to JSON file"""
+    alerts_dir = os.path.dirname(ALERTS_FILE)
+    if alerts_dir and not os.path.exists(alerts_dir):
+        os.makedirs(alerts_dir, exist_ok=True)
     with open(ALERTS_FILE, 'w') as f:
         json.dump(alerts, f, indent=2)
 
