@@ -9,15 +9,17 @@ app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'dev-secret-key')
 # JSON file to store alerts (configurable via environment variable)
 ALERTS_FILE = os.environ.get('ALERTS_FILE', 'alerts.json')
 
+
 def load_alerts():
     """Load alerts from JSON file or return empty list"""
     if os.path.exists(ALERTS_FILE):
         try:
             with open(ALERTS_FILE, 'r') as f:
                 return json.load(f)
-        except:
+        except (json.JSONDecodeError, IOError):
             return []
     return []
+
 
 def save_alerts(alerts):
     """Save alerts to JSON file"""
@@ -26,6 +28,7 @@ def save_alerts(alerts):
         os.makedirs(alerts_dir, exist_ok=True)
     with open(ALERTS_FILE, 'w') as f:
         json.dump(alerts, f, indent=2)
+
 
 def init_alerts():
     """Initialize with sample alerts if file doesn't exist"""
@@ -261,6 +264,7 @@ def category_label(category_key):
     mapping = TRANSLATIONS[get_lang()].get('category_label', {})
     return mapping.get(category_key, category_key)
 
+
 @app.route('/')
 def index():
     """Display all alerts on the homepage"""
@@ -268,6 +272,7 @@ def index():
     # Sort by timestamp, newest first
     alerts.sort(key=lambda x: x['timestamp'], reverse=True)
     return render_template('index.html', alerts=alerts, selected_category='All')
+
 
 @app.route('/filter/<category>')
 def filter_alerts(category):
@@ -278,15 +283,16 @@ def filter_alerts(category):
     alerts.sort(key=lambda x: x['timestamp'], reverse=True)
     return render_template('index.html', alerts=alerts, selected_category=category)
 
+
 @app.route('/post', methods=['GET', 'POST'])
 def post_alert():
     """Admin form to post new alerts"""
     if request.method == 'POST':
         alerts = load_alerts()
-        
+
         # Get the next ID
         next_id = max([a['id'] for a in alerts], default=0) + 1
-        
+
         new_alert = {
             "id": next_id,
             "category": request.form['category'],
@@ -294,13 +300,14 @@ def post_alert():
             "location": request.form['location'],
             "timestamp": datetime.now().isoformat()
         }
-        
+
         alerts.append(new_alert)
         save_alerts(alerts)
-        
+
         return redirect(url_for('index'))
-    
+
     return render_template('post.html', alert=None)
+
 
 @app.route('/api/alerts')
 def api_alerts():
@@ -342,13 +349,17 @@ def set_language(lang_code: str):
         session['lang'] = lang_code
     return redirect(request.referrer or url_for('index'))
 
+
 def is_past(alert):
     """Check if alert is older than 72 hours"""
     alert_time = datetime.fromisoformat(alert['timestamp'])
     return datetime.now() - alert_time > timedelta(hours=72)
 
+
 # Make helpers available to templates
-app.jinja_env.globals.update(is_past=is_past, t=t, category_label=category_label, get_lang=get_lang)
+app.jinja_env.globals.update(
+    is_past=is_past, t=t, category_label=category_label, get_lang=get_lang
+)
 
 if __name__ == '__main__':
     init_alerts()
