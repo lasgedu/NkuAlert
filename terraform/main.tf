@@ -36,9 +36,7 @@ provider "azurerm" {
   skip_provider_registration = true
 }
 
-#
-# RANDOM VALUES FOR UNIQUE RESOURCES
-#
+# Random values for unique resources
 resource "random_integer" "suffix" {
   min = 1000
   max = 9999
@@ -49,18 +47,14 @@ resource "tls_private_key" "ssh" {
   rsa_bits  = 4096
 }
 
-#
-# RESOURCE GROUP
-#
+# Resource Group
 resource "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
   location = var.location
   tags     = var.tags
 }
 
-#
-# VIRTUAL NETWORK + SUBNETS
-#
+# Virtual Network + Subnets
 resource "azurerm_virtual_network" "main" {
   name                = "${var.project_name}-vnet-${random_integer.suffix.result}"
   address_space       = ["10.0.0.0/16"]
@@ -100,9 +94,7 @@ resource "azurerm_subnet" "database" {
   }
 }
 
-#
-# NETWORK SECURITY GROUPS
-#
+# Network Security Groups
 resource "azurerm_network_security_group" "public_nsg" {
   name                = "${var.project_name}-public-nsg"
   location            = azurerm_resource_group.rg.location
@@ -177,9 +169,7 @@ resource "azurerm_subnet_network_security_group_association" "private" {
   network_security_group_id = azurerm_network_security_group.private_nsg.id
 }
 
-#
-# PUBLIC IP + NICs
-#
+# Public IP + NICs
 resource "azurerm_public_ip" "bastion" {
   name                = "${var.project_name}-bastion-pip"
   location            = azurerm_resource_group.rg.location
@@ -218,9 +208,7 @@ resource "azurerm_network_interface" "app" {
   tags = var.tags
 }
 
-#
-# VIRTUAL MACHINES
-#
+# Virtual Machines
 resource "azurerm_linux_virtual_machine" "bastion" {
   name                = "${var.project_name}-bastion-vm"
   resource_group_name = azurerm_resource_group.rg.name
@@ -283,9 +271,7 @@ resource "azurerm_linux_virtual_machine" "app" {
   tags = var.tags
 }
 
-#
-# PRIVATE DNS ZONE FOR DB
-#
+# Private DNS Zone for DB
 resource "azurerm_private_dns_zone" "db" {
   name                = "${var.project_name}.postgres.database.azure.com"
   resource_group_name = azurerm_resource_group.rg.name
@@ -300,9 +286,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "db" {
   tags                  = var.tags
 }
 
-#
-# POSTGRESQL FLEXIBLE SERVER
-#
+# PostgreSQL Flexible Server (fixed lifecycle to avoid zone error)
 resource "azurerm_postgresql_flexible_server" "db" {
   name                   = "${var.project_name}-db-${random_integer.suffix.result}"
   resource_group_name    = azurerm_resource_group.rg.name
@@ -326,6 +310,10 @@ resource "azurerm_postgresql_flexible_server" "db" {
   tags = var.tags
 
   depends_on = [azurerm_private_dns_zone_virtual_network_link.db]
+
+  lifecycle {
+    ignore_changes = [zone]
+  }
 }
 
 resource "azurerm_postgresql_flexible_server_database" "app_db" {
@@ -335,9 +323,7 @@ resource "azurerm_postgresql_flexible_server_database" "app_db" {
   collation = "en_US.utf8"
 }
 
-#
-# CONTAINER REGISTRY
-#
+# Container Registry
 resource "azurerm_container_registry" "acr" {
   name                = "${var.project_name}acr${random_integer.suffix.result}"
   resource_group_name = azurerm_resource_group.rg.name
@@ -347,9 +333,7 @@ resource "azurerm_container_registry" "acr" {
   tags                = var.tags
 }
 
-#
-# STORAGE ACCOUNT
-#
+# Storage Account
 resource "azurerm_storage_account" "storage" {
   name                     = "${var.project_name}st${random_integer.suffix.result}"
   resource_group_name      = azurerm_resource_group.rg.name
