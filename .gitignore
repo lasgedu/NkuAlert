@@ -150,3 +150,4 @@ Thumbs.db
 
 # Logs
 *.log
+.terraform/
