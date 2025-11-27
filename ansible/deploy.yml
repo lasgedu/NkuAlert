@@ -1,0 +1,131 @@
+- name: Deploy Application to Production Server
+  hosts: app_server
+  become: yes
+  vars:
+    acr_login_server: "nkualertacr8204.azurecr.io"
+    acr_username: "5eb91496-482e-426d-81e1-3ae6ae434249"
+    acr_password: "{{ acr_password }}"
+    project_dir: "/opt/nkualert"
+    docker_compose_file: "docker-compose.yml"
+
+  collections:
+    - community.docker
+
+  tasks:
+
+    # -----------------------------
+    # Update apt cache & install required packages
+    # -----------------------------
+    - name: Update apt cache and install packages
+      apt:
+        name:
+          - curl
+          - git
+          - apt-transport-https
+          - ca-certificates
+          - software-properties-common
+        state: present
+        update_cache: yes
+
+    # -----------------------------
+    # Install Docker
+    # -----------------------------
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Install Docker CE packages
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+        update_cache: yes
+
+    - name: Ensure Docker service is started and enabled
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    # -----------------------------
+    # Install Docker Compose binary
+    # -----------------------------
+    - name: Install Docker Compose binary
+      get_url:
+        url: https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+
+    # -----------------------------
+    # Install Docker Python SDK & pip & docker-compose module
+    # -----------------------------
+    - name: Install Docker Python SDK
+      apt:
+        name: python3-docker
+        state: present
+
+    - name: Install python3-pip
+      apt:
+        name: python3-pip
+        state: present
+        update_cache: yes
+
+    - name: Install docker-compose Python module via pip
+      pip:
+        name: docker-compose
+        executable: pip3
+
+    # -----------------------------
+    # Create project directory
+    # -----------------------------
+    - name: Ensure project directory exists
+      file:
+        path: "{{ project_dir }}"
+        state: directory
+        mode: '0755'
+
+    # -----------------------------
+    # Copy docker-compose.yml
+    # -----------------------------
+    - name: Copy docker-compose.yml to server
+      copy:
+        src: ../docker-compose.yml
+        dest: "{{ project_dir }}/{{ docker_compose_file }}"
+        mode: '0644'
+
+    # -----------------------------
+    # Login to Azure Container Registry
+    # -----------------------------
+    - name: Login to Azure Container Registry
+      community.docker.docker_login:
+        registry_url: "{{ acr_login_server }}"
+        username: "{{ acr_username }}"
+        password: "{{ acr_password }}"
+        reauthorize: yes
+
+    # -----------------------------
+    # Pull latest Docker images
+    # -----------------------------
+    - name: Pull latest Docker images
+      community.docker.docker_compose:
+        project_src: "{{ project_dir }}"
+        pull: yes
+        state: present
+
+    # -----------------------------
+    # Deploy or update containers
+    # -----------------------------
+    - name: Deploy application containers
+      community.docker.docker_compose:
+       project_src: "{{ project_dir }}"
+       state: present
+       recreate: smart
+       remove_orphans: yes
