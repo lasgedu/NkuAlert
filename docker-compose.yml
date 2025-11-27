@@ -2,10 +2,7 @@ version: "3.9"
 
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: nkualert:latest
+    image: nkualertacr8204.azurecr.io/nkualert:latest
     ports:
       - "5000:5000"
     environment:
@@ -18,5 +15,3 @@ services:
 volumes:
   alerts_data:
     driver: local
-
-
