@@ -57,14 +57,14 @@ jobs:
       # Container Security Scan (Trivy)
       # -----------------------------
       - name: Trivy Vulnerability Scan
-        uses: aquasecurity/trivy-action@v0.65.0
+        uses: aquasecurity/trivy-action@v0.33.1   # updated to latest version
         with:
-          image-ref: "nkualert:${{ github.sha }}"
-          format: "sarif"
-          output: "trivy-results.sarif"
-          severity: "CRITICAL,HIGH"
-          exit-code: "1"
-          scanner-version: "0.43.3"   # pin Trivy scanner version
+        image-ref: "nkualert:${{ github.sha }}"
+        format: "sarif"
+        output: "trivy-results.sarif"
+        severity: "CRITICAL,HIGH"
+        exit-code: "1"
+        scanner-version: "0.43.3" 
 
       - name: Show Trivy Scanner Version
         run: trivy --version
