@@ -51,9 +51,7 @@ jobs:
       # Container Security Scan (Trivy)
       # -----------------------------
       - name: Trivy Vulnerability Scan
-        uses: - name: Trivy Vulnerability Scan
         uses: aquasecurity/trivy-action@v0.67.2
-
         with:
           image-ref: "nkualert:${{ github.sha }}"
           format: "sarif"
