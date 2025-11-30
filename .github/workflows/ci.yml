@@ -15,6 +15,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # -----------------------------
+      # Checkout Code
+      # -----------------------------
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -50,24 +53,27 @@ jobs:
       # -----------------------------
       # Container Security Scan (Trivy)
       # -----------------------------
+            # -----------------------------
+      # Container Security Scan (Trivy)
+      # -----------------------------
       - name: Trivy Vulnerability Scan
-        uses: aquasecurity/trivy-action@v0.67.2
+        uses: aquasecurity/trivy-action@v0.65.0
         with:
           image-ref: "nkualert:${{ github.sha }}"
           format: "sarif"
           output: "trivy-results.sarif"
           severity: "CRITICAL,HIGH"
           exit-code: "1"
+          scanner-version: "0.43.3"   # pin Trivy scanner version
 
-      - name: Upload Trivy SARIF to GitHub
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: "trivy-results.sarif"
+      - name: Show Trivy Scanner Version
+        run: trivy --version
+
 
       # -----------------------------
-      # IaC Security Scan (tfsec)
+      # Infrastructure as Code Security Scan (tfsec)
       # -----------------------------
-      - name: Run tfsec security scanner
+      - name: tfsec Security Scan
         uses: aquasecurity/tfsec-action@v1.0.0
         with:
           working_directory: terraform/
