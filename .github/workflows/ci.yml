@@ -18,15 +18,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # -----------------------------
       # 1) Checkout Code
-      # -----------------------------
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # -----------------------------
       # 2) Python Setup
-      # -----------------------------
       - name: Set up Python environment
         uses: actions/setup-python@v5
         with:
@@ -38,27 +34,19 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # -----------------------------
       # 3) Linting
-      # -----------------------------
       - name: Lint with flake8
         run: flake8 .
 
-      # -----------------------------
       # 4) Testing
-      # -----------------------------
       - name: Run tests
         run: pytest
 
-      # -----------------------------
       # 5) Docker Build
-      # -----------------------------
       - name: Build Docker image
         run: docker build -t vpendo06/nkualert:pr-${{ github.run_number }} .
 
-      # -----------------------------
       # 6) Trivy Container Image Scan
-      # -----------------------------
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@v0.33.1
         with:
@@ -67,25 +55,21 @@ jobs:
           format: sarif
           output: trivy-results.sarif
           severity: CRITICAL,HIGH
-          exit-code: 1  # Fail build if vulnerabilities are found
+          exit-code: 1
 
       - name: Upload Trivy SARIF to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: trivy-results.sarif
 
-      # -----------------------------
       # 7) Terraform Security Scan (tfsec)
-      # -----------------------------
       - name: Run tfsec security scanner
-        uses: aquasecurity/tfsec-action@v1.0.0
+        uses: aquasecurity/tfsec-action@v1.0.3
         with:
           working_directory: terraform/
-          soft_fail: false  # Fail build on issues
+          soft_fail: false
 
-      # -----------------------------
       # 8) Docker Login & Push
-      # -----------------------------
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
