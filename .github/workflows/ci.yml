@@ -60,7 +60,7 @@ jobs:
       # 6) Trivy Container Image Scan
       # -----------------------------
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@v0.19.0
+        uses: aquasecurity/trivy-action@v0.33.1
         with:
           scan-type: image
           image-ref: vpendo06/nkualert:pr-${{ github.run_number }}
@@ -78,7 +78,7 @@ jobs:
       # 7) Terraform Security Scan (tfsec)
       # -----------------------------
       - name: Run tfsec security scanner
-        uses: aquasecurity/tfsec-action@v0.33.1
+        uses: aquasecurity/tfsec-action@v1.0.0
         with:
           working_directory: terraform/
           soft_fail: false  # Fail build on issues
