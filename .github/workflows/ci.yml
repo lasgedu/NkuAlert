@@ -65,8 +65,9 @@ jobs:
           image-ref: nkualert:${{ github.sha }}
           format: 'sarif'
           output: 'trivy-results.sarif'
-          severity: 'CRITICAL'
+          severity: 'CRITICAL,HIGH'
           exit-code: '1'  # Fail the build if vulnerable
+          scan-opts: '--skip-version-check'
 
       - name: Upload Trivy SARIF to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
