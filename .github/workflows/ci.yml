@@ -19,13 +19,13 @@ jobs:
 
     steps:
       # -----------------------------
-      # Checkout Code
+      # 1) Checkout Code
       # -----------------------------
       - name: Checkout code
         uses: actions/checkout@v4
 
       # -----------------------------
-      # Python Setup
+      # 2) Python Setup
       # -----------------------------
       - name: Set up Python environment
         uses: actions/setup-python@v5
@@ -39,34 +39,34 @@ jobs:
           pip install -r requirements.txt
 
       # -----------------------------
-      # Linting
+      # 3) Linting
       # -----------------------------
       - name: Lint with flake8
         run: flake8 .
 
       # -----------------------------
-      # Testing
+      # 4) Testing
       # -----------------------------
       - name: Run tests
         run: pytest
 
       # -----------------------------
-      # Docker Build
+      # 5) Docker Build
       # -----------------------------
       - name: Build Docker image
-        run: docker build -t nkualert:${{ github.sha }} .
+        run: docker build -t vpendo06/nkualert:pr-${{ github.run_number }} .
 
       # -----------------------------
-      # Trivy Container Image Scan
+      # 6) Trivy Container Image Scan
       # -----------------------------
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: nkualert:${{ github.sha }}
+          image-ref: vpendo06/nkualert:pr-${{ github.run_number }}
           format: 'sarif'
           output: 'trivy-results.sarif'
           severity: 'CRITICAL,HIGH'
-          exit-code: '1'          # Fail the build if vulnerable
+          exit-code: '1'  # Fail build if vulnerabilities are found
           trivy-args: '--skip-version-check'
 
       - name: Upload Trivy SARIF to GitHub Security
@@ -75,10 +75,22 @@ jobs:
           sarif_file: trivy-results.sarif
 
       # -----------------------------
-      # Terraform Security Scan (tfsec)
+      # 7) Terraform Security Scan (tfsec)
       # -----------------------------
       - name: Run tfsec security scanner
         uses: aquasecurity/tfsec-action@v1.0.0
         with:
           working_directory: terraform/
-          soft_fail: false       # Fail if issues are found
+          soft_fail: false  # Fail build on issues
+
+      # -----------------------------
+      # 8) Docker Login & Push
+      # -----------------------------
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push Docker image
+        run: docker push vpendo06/nkualert:pr-${{ github.run_number }}
