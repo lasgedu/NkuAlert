@@ -48,7 +48,7 @@ jobs:
 
       # 6) Trivy Container Image Scan
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@7c0244b  # <-- commit SHA for latest stable Trivy (v0.65.0)
+        uses: aquasecurity/trivy-action@7c0244b8c6bbe5b2b98b1012f747da7477efdba0
         with:
           scan-type: image
           image-ref: vpendo06/nkualert:pr-${{ github.run_number }}
