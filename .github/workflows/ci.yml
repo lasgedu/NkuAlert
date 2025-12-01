@@ -78,7 +78,7 @@ jobs:
       # 7) Terraform Security Scan (tfsec)
       # -----------------------------
       - name: Run tfsec security scanner
-        uses: aquasecurity/tfsec-action@v1.0.0
+        uses: aquasecurity/tfsec-action@v0.33.1
         with:
           working_directory: terraform/
           soft_fail: false  # Fail build on issues
