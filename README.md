@@ -26,29 +26,58 @@ NkuAlert solves this by providing a lightweight, web-accessible platform where t
 - **Data Storage**: JSON file (for F1; scalable to SQLite later)
 - **Deployment**: Docker container, deployable to cloud (e.g., Render, AWS ECS, or Fly.io)
   
-### System Architecture (diagram)
+### Pipeline Architecture Diagram
+(CI)
 ----------------------
-Internet 
-   ↓
-Load Balancer (public)
-   ↓
-Bastion Host (public subnet)
-   ↓
-Bastion 
-   ↓   
-Application VM (private subnet)
-   ↓
-Application VM 
-   ↓
-Managed Database (private subnet)
-   ↓
-GitHub Actions 
-   ↓
-Private Registry (push) 
-   ↓
-Ansible (deploy via Bastion)
+Pull Request Created
+        │
+        ▼
+   Checkout Code
+        │
+        ▼
+     Run Linter
+        │
+        ▼
+     Run Tests
+        │
+        ▼
+  Build Docker Image
+        │
+        ▼
+  Scan Image (Trivy)
+        │
+        ▼
+  Scan IaC (tfsec)
+        │
+   ┌────┴─────┐
+   │          │
+Pass → Allow Merge
+Fail → Block Merge
 --------------------
 
+### Pipeline Architecture Diagram
+(Cd)
+----------------------
+Merge to Main
+        │
+        ▼
+    Run CI Checks
+        │
+        ▼
+    Build Docker Image
+        │
+        ▼
+Push to Container Registry (ECR/ACR)
+        │
+        ▼
+  Run Ansible Playbook
+        │
+        ▼
+ Application Updated
+        │
+        ▼
+ Live on Public URL
+--------------------
 ## Getting Started
 
 ### Prerequisites
