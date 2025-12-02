@@ -4,7 +4,7 @@
   vars:
     acr_login_server: "nkualertacr8204.azurecr.io"
     acr_username: "5eb91496-482e-426d-81e1-3ae6ae434249"
-    acr_password: "{{ acr_password }}"
+    acr_password: "{{ acr_password }}"  # pass via --extra-vars
     project_dir: "/opt/nkualert"
     docker_compose_file: "docker-compose.yml"
 
@@ -16,7 +16,7 @@
     # -----------------------------
     # Update apt cache & install required packages
     # -----------------------------
-    - name: Update apt cache and install packages
+    - name: Update apt cache and install required packages
       apt:
         name:
           - curl
@@ -26,6 +26,7 @@
           - software-properties-common
         state: present
         update_cache: yes
+      tags: packages
 
     # -----------------------------
     # Install Docker
@@ -34,11 +35,13 @@
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
         state: present
+      tags: docker
 
     - name: Add Docker repository
       apt_repository:
         repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
         state: present
+      tags: docker
 
     - name: Install Docker CE packages
       apt:
@@ -48,12 +51,14 @@
           - containerd.io
         state: present
         update_cache: yes
+      tags: docker
 
     - name: Ensure Docker service is started and enabled
       systemd:
         name: docker
         state: started
         enabled: yes
+      tags: docker
 
     # -----------------------------
     # Install Docker Compose binary
@@ -63,25 +68,25 @@
         url: https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-linux-x86_64
         dest: /usr/local/bin/docker-compose
         mode: '0755'
+      tags: docker
 
     # -----------------------------
-    # Install Docker Python SDK & pip & docker-compose module
+    # Install Python dependencies
     # -----------------------------
-    - name: Install Docker Python SDK
+    - name: Install Python Docker SDK and pip
       apt:
-        name: python3-docker
-        state: present
-
-    - name: Install python3-pip
-      apt:
-        name: python3-pip
+        name:
+          - python3-pip
+          - python3-docker
         state: present
         update_cache: yes
+      tags: python
 
     - name: Install docker-compose Python module via pip
       pip:
         name: docker-compose
         executable: pip3
+      tags: python
 
     # -----------------------------
     # Create project directory
@@ -91,15 +96,17 @@
         path: "{{ project_dir }}"
         state: directory
         mode: '0755'
+      tags: setup
 
     # -----------------------------
-    # Copy docker-compose.yml
+    # Copy docker-compose.yml to server
     # -----------------------------
     - name: Copy docker-compose.yml to server
       copy:
         src: ../docker-compose.yml
         dest: "{{ project_dir }}/{{ docker_compose_file }}"
         mode: '0644'
+      tags: setup
 
     # -----------------------------
     # Login to Azure Container Registry
@@ -110,22 +117,29 @@
         username: "{{ acr_username }}"
         password: "{{ acr_password }}"
         reauthorize: yes
+      tags: docker
+      register: acr_login_result
+      failed_when: acr_login_result.failed
+      no_log: true  # hides credentials in logs
 
     # -----------------------------
-    # Pull latest Docker images
+    # Stop existing containers (cleanup)
     # -----------------------------
-    - name: Pull latest Docker images
+    - name: Stop and remove existing Docker Compose containers
+      community.docker.docker_compose:
+        project_src: "{{ project_dir }}"
+        state: absent
+        remove_orphans: yes
+      tags: cleanup
+
+    # -----------------------------
+    # Pull latest Docker images & deploy
+    # -----------------------------
+    - name: Pull and deploy application containers
       community.docker.docker_compose:
         project_src: "{{ project_dir }}"
         pull: yes
         state: present
-
-    # -----------------------------
-    # Deploy or update containers
-    # -----------------------------
-    - name: Deploy application containers
-      community.docker.docker_compose:
-       project_src: "{{ project_dir }}"
-       state: present
-       recreate: smart
-       remove_orphans: yes
+        recreate: always  # ensures old containers are replaced
+        remove_orphans: yes
+      tags: deploy
