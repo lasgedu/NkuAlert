@@ -108,7 +108,7 @@ terraform apply -auto-approve
 ```
 
 4. Configure GitHub Secrets
-- CLOUD credentials (AWS/ Azure)
+- CLOUD credentials (Azure)
 - `SSH_PRIVATE_KEY` — private key used by Ansible to connect via bastion
 - Registry credentials 
 
