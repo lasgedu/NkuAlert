@@ -61,7 +61,7 @@
       tags: docker
 
     # -----------------------------
-    # Install Docker Compose binary
+    # Install Docker Compose binary (v2)
     # -----------------------------
     - name: Install Docker Compose binary
       get_url:
@@ -71,7 +71,7 @@
       tags: docker
 
     # -----------------------------
-    # Install Python dependencies
+    # Install Python Docker SDK and pip
     # -----------------------------
     - name: Install Python Docker SDK and pip
       apt:
@@ -80,12 +80,6 @@
           - python3-docker
         state: present
         update_cache: yes
-      tags: python
-
-    - name: Install docker-compose Python module via pip
-      pip:
-        name: docker-compose
-        executable: pip3
       tags: python
 
     # -----------------------------
@@ -120,13 +114,13 @@
       tags: docker
       register: acr_login_result
       failed_when: acr_login_result.failed
-      no_log: true  # hides credentials in logs
+      no_log: true
 
     # -----------------------------
     # Stop existing containers (cleanup)
     # -----------------------------
     - name: Stop and remove existing Docker Compose containers
-      community.docker.docker_compose:
+      community.docker.docker_compose_v2:
         project_src: "{{ project_dir }}"
         state: absent
         remove_orphans: yes
@@ -136,10 +130,10 @@
     # Pull latest Docker images & deploy
     # -----------------------------
     - name: Pull and deploy application containers
-      community.docker.docker_compose:
+      community.docker.docker_compose_v2:
         project_src: "{{ project_dir }}"
-        pull: yes
+        pull: always          # <--- updated here
         state: present
-        recreate: always  # ensures old containers are replaced
+        recreate: always
         remove_orphans: yes
       tags: deploy
