@@ -25,6 +25,29 @@ NkuAlert solves this by providing a lightweight, web-accessible platform where t
 - **Frontend**: Plain HTML, CSS, and minimal JavaScript (no heavy frameworks)
 - **Data Storage**: JSON file (for F1; scalable to SQLite later)
 - **Deployment**: Docker container, deployable to cloud (e.g., Render, AWS ECS, or Fly.io)
+  
+### System Architecture (diagram)
+----------------------
+Internet 
+   ↓
+Load Balancer (public)
+   ↓
+Bastion Host (public subnet)
+   ↓
+Bastion 
+   ↓   
+Application VM (private subnet)
+   ↓
+Application VM 
+   ↓
+Managed Database (private subnet)
+   ↓
+GitHub Actions 
+   ↓
+Private Registry (push) 
+   ↓
+Ansible (deploy via Bastion)
+--------------------
 
 ## Getting Started
 
@@ -32,19 +55,35 @@ NkuAlert solves this by providing a lightweight, web-accessible platform where t
 - Python 3.8 or higher
 - pip (Python package manager)
 - Docker (optional, for containerized deployment)
-
+- Terraform v1.x
+- Ansible 2.9+
+- Git
+- An AWS or Azure account with permissions for networking, VMs, and a managed database
 ### Installation
 
-1. **Clone the repository**
+1. Clone the repository
    ```bash
    git clone <https://github.com/lasgedu/NkuAlert>
    cd NkuAlert
    ```
-
-2. **Install dependencies**
+2. Install dependencies
    ```bash
    pip install -r requirements.txt
    ```
+3. Provision infrastructure (Terraform)
+
+```powershell
+cd terraform
+terraform init
+terraform apply -auto-approve
+```
+
+4. Configure GitHub Secrets
+- CLOUD credentials (AWS/ Azure)
+- `SSH_PRIVATE_KEY` — private key used by Ansible to connect via bastion
+- Registry credentials 
+
+
 
 3. **Run the application**
    ```bash
@@ -52,22 +91,14 @@ NkuAlert solves this by providing a lightweight, web-accessible platform where t
    ```
 
 4. **Access the application**
-   Open your browser and navigate to `http://localhost:5000`
+   Open your browser and navigate to `https://nkualert-app-lb.uaenorth.cloudapp.azure.com`
 
 ### Running with Docker
 
 1. **Build the Docker image**
    ```bash
-   docker build -t nkualert .
+   docker build -t nkualert.
    ```
-
-2. **Run the container**
-   ```bash
-   docker run -p 5000:5000 nkualert
-   ```
-
-3. **Access the application**
-   Open your browser and navigate to `http://localhost:5000`
 
 ### Running with Docker Compose
 
@@ -84,7 +115,7 @@ Docker Compose lets you build and run everything with one command while persisti
    ```
 
 2. **Open the app**
-   Visit `http://localhost:5000` in your browser.
+   Visit `http://20.174.99.204/` in your browser.
 
 3. **Environment variables**
    - `FLASK_SECRET_KEY` controls Flask session encryption (override in production).
