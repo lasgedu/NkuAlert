@@ -3,7 +3,7 @@
   become: yes
   vars:
     acr_login_server: "nkualertacr8204.azurecr.io"
-    acr_username: "5eb91496-482e-426d-81e1-3ae6ae434249"
+    acr_username: "nkualertacr8204"  # Default to ACR name for admin user (can be overridden via --extra-vars)
     acr_password: "{{ acr_password }}"  # pass via --extra-vars
     project_dir: "/opt/nkualert"
     docker_compose_file: "docker-compose.yml"
@@ -61,6 +61,16 @@
       tags: docker
 
     # -----------------------------
+    # Ensure user can run Docker commands
+    # -----------------------------
+    - name: Add user to docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+      tags: docker
+
+    # -----------------------------
     # Install Docker Compose binary (v2)
     # -----------------------------
     - name: Install Docker Compose binary
@@ -105,6 +115,11 @@
     # -----------------------------
     # Login to Azure Container Registry
     # -----------------------------
+    - name: Verify ACR credentials are set
+      debug:
+        msg: "Attempting to login to {{ acr_login_server }} as {{ acr_username }}"
+      tags: docker
+
     - name: Login to Azure Container Registry
       community.docker.docker_login:
         registry_url: "{{ acr_login_server }}"
@@ -114,6 +129,9 @@
       tags: docker
       register: acr_login_result
       failed_when: acr_login_result.failed
+      # Run as user (not root) so docker login works for the user
+      become: no
+      # Hide password from logs for security
       no_log: true
 
     # -----------------------------
