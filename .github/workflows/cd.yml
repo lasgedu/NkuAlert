@@ -3,7 +3,7 @@ name: CD - Deploy to Production
 on:
   push:
     branches:
-      - main  # Runs ONLY after merge to main
+      - main  # Only runs after merge to main
 
 permissions:
   contents: read
@@ -30,7 +30,7 @@ jobs:
           python-version: '3.11'
           cache: pip
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -55,7 +55,7 @@ jobs:
           password: ${{ secrets.ACR_PASSWORD }}
 
       # ---------------------------------
-      # Pull latest Docker image from ACR
+      # Pull latest Docker image
       # ---------------------------------
       - name: Pull latest Docker image
         run: docker pull nkualertacr8204.azurecr.io/nkualert:latest
@@ -73,10 +73,15 @@ jobs:
       # ---------------------------------
       - name: Run Ansible Deployment
         run: |
+          # Save SSH key to temporary file
+          echo "${{ secrets.APP_SSH_KEY }}" > /tmp/app_key.pem
+          chmod 600 /tmp/app_key.pem
+
+          # Execute Ansible playbook
           ansible-playbook ansible/deploy.yml \
             -i ansible/inventory.ini \
-            --private-key ${{ secrets.APP_SSH_KEY }} \
-            --extra-vars "new_tag=latest"
+            --private-key /tmp/app_key.pem \
+            --extra-vars "new_tag=latest acr_password=${{ secrets.ACR_PASSWORD }}"
         env:
           ANSIBLE_HOST_KEY_CHECKING: "false"
           ANSIBLE_REMOTE_USER: ${{ secrets.APP_USER }}
