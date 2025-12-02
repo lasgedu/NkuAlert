@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   web:
     image: nkualertacr8204.azurecr.io/nkualert:latest
