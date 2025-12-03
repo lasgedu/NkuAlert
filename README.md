@@ -1,5 +1,14 @@
 # NkuAlert
 
+## Final Video Presentation Link
+  YouTube `https://youtu.be/ThcW6AxQaiM`
+
+1. **Access the application**
+   Open your browser and navigate to `http://nkualert-app-lb.uaenorth.cloudapp.azure.com/`
+
+2. **Open the app**
+   Visit `http://20.174.99.204/` in your browser.
+   
 **Timely local alerts for weather, health, and civic updates**
 
 ## Project Description
@@ -21,10 +30,88 @@ NkuAlert solves this by providing a lightweight, web-accessible platform where t
 5. **Alert Expiry Indicator** - Alerts older than 72 hours are marked "Past"
 
 ### Technology Stack
-- **Backend**: Python with Flask (minimal, easy to containerize)
-- **Frontend**: Plain HTML, CSS, and minimal JavaScript (no heavy frameworks)
-- **Data Storage**: JSON file (for F1; scalable to SQLite later)
-- **Deployment**: Docker container, deployable to cloud (e.g., Render, AWS ECS, or Fly.io)
+- **Backend**: Python with Flask 
+- **Frontend**: Plain HTML and CSS
+- **Data Storage**: JSON file
+- **Deployment**: Deployment = CD pipeline (GitHub Actions) + Ansible playbook + Docker registry.
+
+### Installation
+
+1. Clone the repository
+   ```bash
+   git clone <https://github.com/lasgedu/NkuAlert>
+   cd NkuAlert
+   ```
+2. Install dependencies
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Provision infrastructure (Terraform)
+
+```powershell
+cd terraform
+terraform init
+terraform apply -auto-approve
+```
+
+4. Configure GitHub Secrets
+- CLOUD credentials (Azure)
+- `SSH_PRIVATE_KEY` — private key used by Ansible to connect via bastion
+- Registry credentials 
+
+
+
+3. **Run the application**
+   ```bash
+   python app.py
+   ```
+
+
+### Running with Docker
+
+1. **Build the Docker image**
+   ```bash
+   docker build -t nkualert.
+   ```
+
+### Running with Docker Compose
+
+Docker Compose lets you build and run everything with one command while persisting alert data.
+
+1. **Start the stack (builds if needed)**
+   ```bash
+   docker compose up --build
+   ```
+   
+   To run in the background (detached mode):
+   ```bash
+   docker compose up -d --build
+   ```
+
+2. **Open the app**
+   Visit `http://20.174.99.204/` in your browser.
+
+3. **Environment variables**
+   - `FLASK_SECRET_KEY` controls Flask session encryption (override in production).
+   - `ALERTS_FILE` points to the alerts JSON file (defaults to `/data/alerts.json`).
+
+4. **Persisted data**
+   Alerts are stored in the named volume `alerts_data`, so they survive container restarts.
+
+5. **Stop the services**
+   ```bash
+   docker compose down
+   ```
+
+6. **Clean up volumes (removes saved alerts)**
+   ```bash
+   docker compose down -v
+   ```
+  **Infrastructure Details:**
+- **Bastion Host IP:** `40.123.232.219` (for SSH access)
+- **Load Balancer IP:** `20.174.99.204` (public application access)
+- **Resource Group:** `nkualert-rg`
+- **Location:** UAE North
   
 ### Pipeline Architecture Diagram
 (CI)
@@ -82,86 +169,12 @@ Push to Container Registry (ECR/ACR)
 
 ### Prerequisites
 - Python 3.8 or higher
-- pip (Python package manager)
-- Docker (optional, for containerized deployment)
+- pip 
+- Docker 
 - Terraform v1.x
 - Ansible 2.9+
 - Git
-- An AWS or Azure account with permissions for networking, VMs, and a managed database
-### Installation
-
-1. Clone the repository
-   ```bash
-   git clone <https://github.com/lasgedu/NkuAlert>
-   cd NkuAlert
-   ```
-2. Install dependencies
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. Provision infrastructure (Terraform)
-
-```powershell
-cd terraform
-terraform init
-terraform apply -auto-approve
-```
-
-4. Configure GitHub Secrets
-- CLOUD credentials (AWS/ Azure)
-- `SSH_PRIVATE_KEY` — private key used by Ansible to connect via bastion
-- Registry credentials 
-
-
-
-3. **Run the application**
-   ```bash
-   python app.py
-   ```
-
-4. **Access the application**
-   Open your browser and navigate to `https://nkualert-app-lb.uaenorth.cloudapp.azure.com`
-
-### Running with Docker
-
-1. **Build the Docker image**
-   ```bash
-   docker build -t nkualert.
-   ```
-
-### Running with Docker Compose
-
-Docker Compose lets you build and run everything with one command while persisting alert data.
-
-1. **Start the stack (builds if needed)**
-   ```bash
-   docker compose up --build
-   ```
-   
-   To run in the background (detached mode):
-   ```bash
-   docker compose up -d --build
-   ```
-
-2. **Open the app**
-   Visit `http://20.174.99.204/` in your browser.
-
-3. **Environment variables**
-   - `FLASK_SECRET_KEY` controls Flask session encryption (override in production).
-   - `ALERTS_FILE` points to the alerts JSON file (defaults to `/data/alerts.json`).
-
-4. **Persisted data**
-   Alerts are stored in the named volume `alerts_data`, so they survive container restarts.
-
-5. **Stop the services**
-   ```bash
-   docker compose down
-   ```
-
-6. **Clean up volumes (removes saved alerts)**
-   ```bash
-   docker compose down -v
-   ```
+- An Azure account with permissions for networking
 
 ## Usage
 
