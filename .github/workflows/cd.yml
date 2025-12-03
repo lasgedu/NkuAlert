@@ -73,15 +73,68 @@ jobs:
       # ---------------------------------
       - name: Run Ansible Deployment
         run: |
-          # Save SSH key to temporary file
+          set -e  # Exit on error
+          
+          # Save SSH key to temporary file (preserve newlines correctly)
           echo "${{ secrets.APP_SSH_KEY }}" > /tmp/app_key.pem
           chmod 600 /tmp/app_key.pem
+          
+          # Verify key file was created correctly
+          if [ ! -s /tmp/app_key.pem ]; then
+            echo "ERROR: SSH key file is empty or missing"
+            exit 1
+          fi
+          
+          # Save bastion SSH key (same key for both VMs)
+          cp /tmp/app_key.pem /tmp/bastion_key.pem
+          chmod 600 /tmp/bastion_key.pem
+
+          # Verify required secrets are set
+          if [ -z "${{ secrets.APP_PRIVATE_IP }}" ] || [ -z "${{ secrets.BASTION_PUBLIC_IP }}" ] || [ -z "${{ secrets.APP_USER }}" ]; then
+            echo "ERROR: Missing required secrets (APP_PRIVATE_IP, BASTION_PUBLIC_IP, or APP_USER)"
+            exit 1
+          fi
+
+          # Test SSH connection to bastion first
+          echo "Testing bastion connection..."
+          ssh -i /tmp/bastion_key.pem \
+            -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/dev/null \
+            -o ConnectTimeout=10 \
+            ${{ secrets.APP_USER }}@${{ secrets.BASTION_PUBLIC_IP }} \
+            "echo 'Bastion connection successful'" || {
+            echo "ERROR: Failed to connect to bastion host"
+            exit 1
+          }
+
+          # Create dynamic inventory file for CI/CD
+          cat > /tmp/inventory.ini << 'INVENTORY_EOF'
+          [app_server]
+          app-vm ansible_host=APP_PRIVATE_IP_PLACEHOLDER
+
+          [app_server:vars]
+          ansible_user=APP_USER_PLACEHOLDER
+          ansible_ssh_private_key_file=/tmp/app_key.pem
+          ansible_ssh_common_args='-o ProxyCommand="ssh -i /tmp/bastion_key.pem -W %h:%p -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10 APP_USER_PLACEHOLDER@BASTION_IP_PLACEHOLDER" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10'
+          INVENTORY_EOF
+          
+          # Replace placeholders with actual values
+          sed -i "s/APP_PRIVATE_IP_PLACEHOLDER/${{ secrets.APP_PRIVATE_IP }}/g" /tmp/inventory.ini
+          sed -i "s/APP_USER_PLACEHOLDER/${{ secrets.APP_USER }}/g" /tmp/inventory.ini
+          sed -i "s/BASTION_IP_PLACEHOLDER/${{ secrets.BASTION_PUBLIC_IP }}/g" /tmp/inventory.ini
+
+          # Display inventory for debugging (without sensitive data)
+          echo "Inventory file created:"
+          cat /tmp/inventory.ini | sed 's/ansible_ssh_private_key_file=.*/ansible_ssh_private_key_file=***/'
 
           # Execute Ansible playbook
+          echo "Running Ansible playbook..."
           ansible-playbook ansible/deploy.yml \
-            -i ansible/inventory.ini \
+            -i /tmp/inventory.ini \
             --private-key /tmp/app_key.pem \
-            --extra-vars "new_tag=latest acr_password=${{ secrets.ACR_PASSWORD }}"
+            --user ${{ secrets.APP_USER }} \
+            --extra-vars "new_tag=latest acr_password=${{ secrets.ACR_PASSWORD }}" \
+            -v
         env:
           ANSIBLE_HOST_KEY_CHECKING: "false"
-          ANSIBLE_REMOTE_USER: ${{ secrets.APP_USER }}
+          ANSIBLE_SSH_COMMON_ARGS: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10"
